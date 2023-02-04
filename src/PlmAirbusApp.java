@@ -18,7 +18,7 @@ public class PlmAirbusApp {
 	public static final String BLACK = "\033[0;30m";
 	public static final String PURPLE = "\033[0;35m";
 	public static final String CYAN = "\033[0;36m";
-	static Entry<Integer, ArrayList<String>> searchResult = null;
+	public static HashMap<Integer, ArrayList<String>> searchResults = new HashMap<>();
 
 	public static void main(String[] args) {
 		// Aircrafts info
@@ -52,12 +52,12 @@ public class PlmAirbusApp {
 		while (menuSelection != 5) {
 			switch (menuSelection) {
 			case 1:
-				displayAllByID1(aircraftsData);
+				displayAllById1(aircraftsData);
 				// 4 more different ways to do the same thing
-//				displayAllByID2(aircraftsData);
-//				displayAllByID3(aircraftsData);
-//				displayAllByID4(aircraftsData);
-//				displayAllByID5(aircraftsData);
+//				displayAllById2(aircraftsData);
+//				displayAllById3(aircraftsData);
+//				displayAllById4(aircraftsData);
+//				displayAllById5(aircraftsData);
 				System.out.println(BLACK);
 //				displayMainMenu();  // Optional
 				menuSelection = scan.nextInt();
@@ -110,7 +110,7 @@ public class PlmAirbusApp {
 	 * @param hmap the aircrafts in the PLM (key: aircraft id, value: aircraft info
 	 *             (Program, Type, Phase)
 	 */
-	public static void displayAllByID1(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displayAllById1(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
@@ -127,7 +127,7 @@ public class PlmAirbusApp {
 	 * 
 	 * @param hmap the aircrafts in the PLM app
 	 */
-	public static void displayAllByID2(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displayAllById2(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
@@ -147,7 +147,7 @@ public class PlmAirbusApp {
 	 * 
 	 * @param hmap the aircrafts in the PLM app
 	 */
-	public static void displayAllByID3(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displayAllById3(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
@@ -169,7 +169,7 @@ public class PlmAirbusApp {
 	 * 
 	 * @param hmap the aircrafts in the PLM app
 	 */
-	public static void displayAllByID4(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displayAllById4(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
@@ -188,7 +188,7 @@ public class PlmAirbusApp {
 	 * 
 	 * @param hmap the aircrafts in the PLM app
 	 */
-	public static void displayAllByID5(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displayAllById5(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
@@ -204,7 +204,8 @@ public class PlmAirbusApp {
 
 	/**
 	 * Displays search menu and allows user to search the PLM for a keyword in
-	 * aircraft name field
+	 * aircraft name field. Allows user to search for keywords until exits search
+	 * menu.
 	 * 
 	 * @param aircraftsData the aircrafts in the PLM app (HashMap)
 	 * @param userInput     user input (Scanner)
@@ -218,10 +219,10 @@ public class PlmAirbusApp {
 			String keyword = userInput.next();
 			// search data for keyword
 			searchAircraftData(aircraftsData, keyword); // returns searchResult
-			if (searchResult != null) {
-				displaySearchResult(searchResult);
-			} else {
+			if (searchResults.isEmpty()) {
 				System.out.println("Aucun avion ne contient '" + keyword + "' dans son nom.");
+			} else {
+				displaySearchResult(searchResults);
 			}
 
 			// continue searching or quit
@@ -242,34 +243,38 @@ public class PlmAirbusApp {
 	 * 
 	 * @param aircraftsData the aircrafts in the PLM app (HashMap)
 	 * @param keyword       user input (Scanner)
-	 * @return search result (Map entry (key-value pair))
+	 * @return searchResults the aircraft(s) which name(s) contain(s) keyword / part
+	 *         of the keyword
 	 * 
 	 */
-	public static Entry<Integer, ArrayList<String>> searchAircraftData(
+	public static HashMap<Integer, ArrayList<String>> searchAircraftData(
 			HashMap<Integer, ArrayList<String>> aircraftsData, String keyword) {
-
 		System.out.println();
-		System.out.println("Résultat de la recherche:");
+		System.out.println("Résultat(s) de la recherche:");
 
-		searchResult = null;
-		for (Entry<Integer, ArrayList<String>> entry : aircraftsData.entrySet()) {
+		searchResults = new HashMap<>();
+		for (Map.Entry<Integer, ArrayList<String>> entry : aircraftsData.entrySet()) {
+			int id = entry.getKey();
 			ArrayList<String> aircraftInfo = entry.getValue();
-			if (aircraftInfo.get(0).contains(keyword))
-				searchResult = entry;
+			if (aircraftInfo.get(0).contains(keyword)) {
+				// populate searchResults HashMap with key and value of Map.Entry containing
+				// keyword
+				searchResults.put(id, aircraftInfo);
+			}
 		}
-		return searchResult;
+		return searchResults;
 	}
 
 	/**
-	 * Displays search result (HashMap Entry)
+	 * Displays search result (HashMap)
 	 * 
-	 * @param entry the aircraft id and info in the PLM app (key: aircraft id,
-	 *              value: aircraft info (Program, Type, Phase)
+	 * @param searchResults the aircraft(s) which name(s) contain(s) keyword / part
+	 *                      of the keyword
 	 */
-	public static void displaySearchResult(Entry<Integer, ArrayList<String>> entry) {
+	public static void displaySearchResult(HashMap<Integer, ArrayList<String>> searchResults) {
 //		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
-		System.out.println(entry.getKey() + "\t" + entry.getValue());
+		searchResults.forEach((id, aircraftInfo) -> System.out.println(id + "\t" + aircraftInfo));
 		System.out.println("---------------------------------------");
 
 	}
