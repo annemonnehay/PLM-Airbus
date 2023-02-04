@@ -1,6 +1,6 @@
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 /**
  * This class manages the product life cycle of Airbus aircrafts
+ * 
  * @author AnneM
  * 
  */
@@ -18,24 +19,24 @@ public class PlmAirbusApp {
 	public static final String BLACK = "\033[0;30m";
 	public static final String PURPLE = "\033[0;35m";
 	public static final String CYAN = "\033[0;36m";
-	static ArrayList<String> searchResult = null;
+	static Entry<Integer, ArrayList<String>> searchResults = null;
 
 	public static void main(String[] args) {
-		// Products info
-		HashMap<Integer, ArrayList<String>> products = new HashMap<>();
-		products.put(001, new ArrayList<>(Arrays.asList("A350", "Passenger", "FEASIBILITY")));
-		products.put(002, new ArrayList<>(Arrays.asList("A330", "Passenger", "IN_SERVICE")));
-		products.put(003, new ArrayList<>(Arrays.asList("A321XLR", "Passenger", "CONCEPT")));
-		products.put(004, new ArrayList<>(Arrays.asList("A300", "Passenger", "STOPPED")));
-		products.put(005, new ArrayList<>(Arrays.asList("A400M", "Military", "STOPPED")));
-		products.put(006, new ArrayList<>(Arrays.asList("A319CJ", "Business", "IN_SERVICE")));
-		products.put(007, new ArrayList<>(Arrays.asList("A380", "Freight", "IN_SERVICE")));
+		// Aircrafts info
+		HashMap<Integer, ArrayList<String>> aircraftsData = new HashMap<>();
+		aircraftsData.put(001, new ArrayList<>(Arrays.asList("A350", "Passenger", "FEASIBILITY")));
+		aircraftsData.put(002, new ArrayList<>(Arrays.asList("A330", "Passenger", "IN_SERVICE")));
+		aircraftsData.put(003, new ArrayList<>(Arrays.asList("A321XLR", "Passenger", "CONCEPT")));
+		aircraftsData.put(004, new ArrayList<>(Arrays.asList("A300", "Passenger", "STOPPED")));
+		aircraftsData.put(005, new ArrayList<>(Arrays.asList("A400M", "Military", "STOPPED")));
+		aircraftsData.put(006, new ArrayList<>(Arrays.asList("A319CJ", "Business", "IN_SERVICE")));
+		aircraftsData.put(007, new ArrayList<>(Arrays.asList("A380", "Freight", "IN_SERVICE")));
 
 		// Parts info
-		HashMap<Integer, ArrayList<String>> parts = new HashMap<>();
-		parts.put(001, new ArrayList<>(Arrays.asList("rudder", "engine", "unknown")));
-		parts.put(002, new ArrayList<>(Arrays.asList("propeller", "engine", "unknown")));
-		parts.put(003, new ArrayList<>(Arrays.asList("instrument panel", "cockpit", "unknown")));
+		HashMap<Integer, ArrayList<String>> partsData = new HashMap<>();
+		partsData.put(001, new ArrayList<>(Arrays.asList("rudder", "engine", "unknown")));
+		partsData.put(002, new ArrayList<>(Arrays.asList("propeller", "engine", "unknown")));
+		partsData.put(003, new ArrayList<>(Arrays.asList("instrument panel", "cockpit", "unknown")));
 
 		Scanner scan = new Scanner(System.in);
 
@@ -52,13 +53,18 @@ public class PlmAirbusApp {
 		while (menuSelection != 5) {
 			switch (menuSelection) {
 			case 1:
-				displayAllByID(products);
+				displayAllByID1(aircraftsData);
+				// 4 more different ways to do the same thing
+//				displayAllByID2(aircrafts);
+//				displayAllByID3(aircrafts);
+//				displayAllByID4(aircrafts);
+//				displayAllByID5(aircrafts);
 				System.out.println(BLACK);
 //				displayMainMenu();  // Optional
 				menuSelection = scan.nextInt();
 				break;
 			case 2:
-				displaySearchMenu(products, scan);
+				displaySearchMenu(aircraftsData, scan);
 				displayMainMenu();
 				menuSelection = scan.nextInt();
 				break;
@@ -76,7 +82,7 @@ public class PlmAirbusApp {
 				displayMainMenu();
 				menuSelection = scan.nextInt();
 			}
-		} 
+		}
 		if (menuSelection == 5) {
 			System.out.println("Au revoir");
 			System.exit(0);
@@ -88,6 +94,7 @@ public class PlmAirbusApp {
 	 * Displays main menu options
 	 */
 	public static void displayMainMenu() {
+
 		System.out.println(BLACK + "**Menu principal**\n");
 		System.out.println("Faites votre choix dans le menu, saisissez le chiffre correspondant:");
 		System.out.println("[1] Afficher tous les avions");
@@ -96,59 +103,52 @@ public class PlmAirbusApp {
 		System.out.println("[4] Afficher un avion avec les infos détaillées de chaque pièce (Work in progress)");
 		System.out.println("[5] Quitter l'application");
 	}
-
 	/**
-	 * Displays all aircrafts
-	 * METHOD 1: Iterates HashMap using for-each loop
-	 * @param hmap the aircrafts in the data structure
+	 * Displays searchResults
+	 * 
+	 * @param hmap the aircrafts in the data structure (key: aircraft ID, value:
+	 *             aircraft info (Program, Type, Phase)
 	 */
-	public static void displayAllByID(HashMap<Integer, ArrayList<String>> hmap) {
+	public static void displaySearchResults(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
-		// -----> Iterate HashMap using for-each loop
-		for (Map.Entry<Integer, ArrayList<String>> entry : hmap.entrySet()) {
-			System.out.print(entry.getKey() + "\t");
-			System.out.println(entry.getValue());
-		}
+		// 1. Iterate through a HashMap using forEach + lambda
+		hmap.forEach((k, v) -> System.out.println(k + "\t" + v));
+		System.out.println("---------------------------------------");
+
+	}
+	
+
+	/**
+	 * Displays all aircrafts METHOD 1: Iterates HashMap using forEach loop and
+	 * lambda
+	 * 
+	 * @param hmap the aircrafts in the data structure (key: aircraft ID, value:
+	 *             aircraft info (Program, Type, Phase)
+	 */
+	public static void displayAllByID1(HashMap<Integer, ArrayList<String>> hmap) {
+		System.out.println(CYAN + "**Mode affichage**\n");
+		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
+		System.out.println("---------------------------------------");
+		// 1. Iterate through a HashMap using forEach + lambda
+		hmap.forEach((k, v) -> System.out.println(k + "\t" + v));
 		System.out.println("---------------------------------------");
 
 	}
 
 // ******************** Different ways to do the same thing (display data structure)******************
-
 	/**
-	 * Displays all aircrafts
-	 * METHOD 2: Iterates through HashMap EntrySet using Iterator
+	 * Displays all aircrafts METHOD 2: Iterates through HashMap KeySet using
+	 * Iterator
+	 * 
 	 * @param hmap the aircrafts in the data structure
 	 */
 	public static void displayAllByID2(HashMap<Integer, ArrayList<String>> hmap) {
 		System.out.println(CYAN + "**Mode affichage**\n");
 		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
 		System.out.println("---------------------------------------");
-
-		// -----> Iterate through HashMap EntrySet using Iterator
-		Iterator<Entry<Integer, ArrayList<String>>> iterator = hmap.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<Integer, ArrayList<String>> product = iterator.next();
-			System.out.print(product.getKey() + "\t");
-			System.out.println(product.getValue());
-		}
-		System.out.println("---------------------------------------");
-	}
-
-	/**
-	 * Displays all aircrafts 
-	 * METHOD 3: Iterates through HashMap KeySet using Iterator
-	 * @param hmap the aircrafts in the data structure
-	 */
-
-	public static void displayAllByID3(HashMap<Integer, ArrayList<String>> hmap) {
-		System.out.println(CYAN + "**Mode affichage**\n");
-		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
-		System.out.println("---------------------------------------");
-
-		// -----> Iterate through HashMap KeySet using Iterator
+		// 3. Iterate through HashMap KeySet using Iterator
 		Iterator<Integer> iterator = hmap.keySet().iterator();
 		while (iterator.hasNext()) {
 			Integer key = iterator.next();
@@ -157,6 +157,65 @@ public class PlmAirbusApp {
 		}
 		System.out.println("---------------------------------------");
 	}
+
+	/**
+	 * Displays all aircrafts METHOD 3: Iterates through HashMap EntrySet using
+	 * Iterator
+	 * 
+	 * @param hmap the aircrafts in the data structure
+	 */
+	public static void displayAllByID3(HashMap<Integer, ArrayList<String>> hmap) {
+		System.out.println(CYAN + "**Mode affichage**\n");
+		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
+		System.out.println("---------------------------------------");
+		// 2. Iterate through HashMap EntrySet using Iterator<Entry<...hmap...>>
+		Iterator<Entry<Integer, ArrayList<String>>> it = hmap.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<Integer, ArrayList<String>> product = it.next();
+			System.out.print(product.getKey() + "\t");
+			System.out.println(product.getValue());
+		}
+		System.out.println("---------------------------------------");
+
+	}
+
+	/**
+	 * Displays all aircrafts METHOD 4: Iterates through HashMap using for-each loop
+	 * and Map.Entry, .entrySet(), .getKey() and .getValue()
+	 * 
+	 * @param hmap the aircrafts in the data structure
+	 */
+	public static void displayAllByID4(HashMap<Integer, ArrayList<String>> hmap) {
+		System.out.println(CYAN + "**Mode affichage**\n");
+		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
+		System.out.println("---------------------------------------");
+		// 4. Iterate HashMap using for-each loop + Map.Entry<...hmap...>
+		for (Map.Entry<Integer, ArrayList<String>> entry : hmap.entrySet()) {
+			System.out.print(entry.getKey() + "\t");
+			System.out.println(entry.getValue());
+		}
+		System.out.println("---------------------------------------");
+	}
+
+	/**
+	 * Displays all aircrafts METHOD 5: Iterates through HashMap using for-each loop
+	 * and Collection, Entry, .entrySet(), .getKey() and .getValue()
+	 * 
+	 * @param hmap the aircrafts in the data structure
+	 */
+	public static void displayAllByID5(HashMap<Integer, ArrayList<String>> hmap) {
+		System.out.println(CYAN + "**Mode affichage**\n");
+		System.out.println("ID" + "\t| " + "PROGRAM" + " | " + "TYPE" + " | " + "PHASE");
+		System.out.println("---------------------------------------");
+		// 5. Iterate HashMap using for-each loop + Collection<Entry<...hmap...>>
+		Collection<Entry<Integer, ArrayList<String>>> entrySet1 = hmap.entrySet();
+		for (Entry<Integer, ArrayList<String>> item : entrySet1) {
+			System.out.print(item.getKey() + "\t");
+			System.out.println(item.getValue());
+		}
+		System.out.println("---------------------------------------");
+	}
+// **********************************************************************************
 
 	/**
 	 * Displays search menu
@@ -171,7 +230,7 @@ public class PlmAirbusApp {
 		while (isSearching) {
 			String keyword = scan.next();
 			// search data for keyword
-			searchProductsData(productsData, keyword);
+			searchAircraftData(productsData, keyword);
 
 			// Impossible to implement without introducing another bug
 //			if(searchResult != null) {
@@ -194,22 +253,23 @@ public class PlmAirbusApp {
 	}
 
 	/**
-	 * Searches aircrafts data structure (HashMap) for keyword
+	 * Searches aircrafts data structure (HashMap) for keyword (String)
 	 * 
-	 * @param hmap the aircrafts in the data structure
+	 * @param hmap    the aircrafts in the data structure
 	 * @param keyword user input
 	 */
-	public static void searchProductsData(HashMap<Integer, ArrayList<String>> hmap, String keyword) {
+	public static void searchAircraftData(HashMap<Integer, ArrayList<String>> hmap, String keyword) {
 		System.out.println("Search results:");
 		for (Map.Entry<Integer, ArrayList<String>> entry : hmap.entrySet()) {
-			ArrayList<String> productsInfo = entry.getValue();
-			for (int i = 0; i < productsInfo.size(); i++) {
-				if (productsInfo.get(i).contains(keyword))
-					System.out.println(productsInfo);
-//					searchResult = productsInfo;
+			ArrayList<String> aircraftInfo = entry.getValue();
+			for (int i = 0; i < aircraftInfo.size(); i++) {
+				if (aircraftInfo.get(i).contains(keyword))
+					System.out.println(aircraftInfo);
+//					searchResults = entry;
+//					System.out.println(searchResults);
 			}
 		}
-		// don't know how to use this return value so switched to sysout + void return type
+	
 //		return searchResult; 
 	}
 
